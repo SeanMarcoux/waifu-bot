@@ -156,4 +156,4 @@ function download(uri, filename, callback){
   });
 }
 
-client.login('NDE5MzM1OTQ2OTc1MzEzOTMw.DXusTQ.hKkXE5oEsfCAW6NXz6cBP4g4RHI');
+client.login('');
