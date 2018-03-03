@@ -7,6 +7,11 @@ var waifuDir = "waifus";
 var currentWaifu = "misc";
 var waifuScores = []
 
+/*TODO
+1. Backup votes to a file
+2. Ensure only certain filetypes can be downloaded
+3. Limit votes per person per day
+*/
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
         fs.mkdirSync(waifuDir);
@@ -165,7 +170,16 @@ function receivePicture(msg) {
     var attachments = msg.attachments.array();
     var filename_count = 0;
     for(var i=0; i < attachments.length; i++) {
-        console.log("Downloading file " + attachments[i].filename);
+        var filename = attachments[i].filename;
+        split_name = filename.split(".");
+        var filetype = split_name[split_name.length-1];
+        if(filetype != "jpg" && filetype != "gif" && filetype != "png") {
+            console.log("Got sketchy file: " + filename);
+            msg.reply("I only accept jpg, png, and gif files! Pls no viruses");
+            return;
+        }
+        
+        console.log("Downloading file " + filename);
         var filename = attachments[i].filename;
         if(!fs.existsSync(waifuDir+"/" + currentWaifu)) {
             fs.mkdirSync(waifuDir+"/" + currentWaifu);
@@ -173,8 +187,7 @@ function receivePicture(msg) {
         }
         while(fs.existsSync(waifuDir+"/" + currentWaifu + "/" + filename)) {
             filename_count++;
-            split_name = filename.split(".");
-            filename = filename_count + "." + split_name[split_name.length-1];
+            filename = filename_count + "." + filetype;
         }
         console.log("Downloading it as " + waifuDir + "/" + currentWaifu + "/" + filename);
         download(attachments[i].url, waifuDir+"/"+currentWaifu+"/"+filename, function() {
