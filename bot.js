@@ -156,4 +156,6 @@ function download(uri, filename, callback){
   });
 }
 
-client.login('');
+
+var key = fs.readFileSync("key.txt");
+client.login(key.toString());
