@@ -4,13 +4,13 @@ const fs = require('fs');
 const request = require('request');
 
 var waifuDir = "waifus";
+var scoreFile = "waifu-scores.txt";
 var currentWaifu = "misc";
 var waifuScores = []
 
 /*TODO
-1. Backup votes to a file
-2. Ensure only certain filetypes can be downloaded
-3. Limit votes per person per day
+1. Limit votes per person per day
+2. When saying names, capitalize the first letter of each name
 */
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -29,10 +29,32 @@ client.on('ready', () => {
 });
 
 function initializeWaifuScores() {
-    var files = fs.readdirSync(waifuDir);
-    for(var i = 0; i < files.length; i++) {
-        waifuScores[files[i]] = 1;
+    if(!fs.existsSync(scoreFile)) {
+        var files = fs.readdirSync(waifuDir);
+        for(var i = 0; i < files.length; i++) {
+            waifuScores[files[i]] = 1;
+        }
+        backupScores();
     }
+    else {
+        var fileText = fs.readFileSync(scoreFile).toString();
+        var lines = fileText.split("\r\n");
+        for(var i = 0; i < lines.length; i++) {
+            if(lines[i].length == 0)
+                break;
+            var waifu = lines[i].slice(0, lines[i].lastIndexOf(" "));
+            var score = lines[i].slice(lines[i].lastIndexOf(" ")+1, lines[i].length);
+            waifuScores[waifu] = score;
+        }
+    }
+}
+
+function backupScores() {
+    var fileText = "";
+    for(waifu in waifuScores) {
+        fileText += waifu + " " + waifuScores[waifu] + "\r\n";
+    }
+    fs.writeFileSync(scoreFile, fileText);
 }
 
 client.on('message', msg => {
@@ -41,7 +63,6 @@ client.on('message', msg => {
     if(msg.author.username == "waifu-bot")
         return;
     var message = msg.content.toLowerCase();
-    reactToBS(msg, message);
     
     if(message === "waifu-bot, die")
     {
@@ -52,9 +73,11 @@ client.on('message', msg => {
             }, 1000);
         }, 1000);
     }
+    
+    reactToCommands(msg, message);
 });
 
-function reactToBS(msg, message)
+function reactToCommands(msg, message)
 {
     if(!message.startsWith("!")) {
         if(msg.attachments.array().length != 0)
@@ -217,6 +240,7 @@ function voteForBestGirl(msg) {
     }
     
     waifuScores[bestGirl]++;
+    backupScores();
     msg.reply("Vote cast for " + bestGirl + ". They are now at " + waifuScores[bestGirl] + " points!");
 }
 
