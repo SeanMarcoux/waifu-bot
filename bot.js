@@ -26,7 +26,7 @@ client.on('ready', () => {
 function initializeWaifuScores() {
     var files = fs.readdirSync(waifuDir);
     for(var i = 0; i < files.length; i++) {
-        waifuScores[files[i]] = 0;
+        waifuScores[files[i]] = 1;
     }
 }
 
@@ -105,7 +105,9 @@ function noWaifuNoLaifu(msg) {
         var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
     else {
-        chosenWaifu = getRandomFileFromFolder(waifuDir);
+        var totalVotes = getTotalVotes();
+        var index = getRandomInt(1, totalVotes);
+        chosenWaifu = getWaifuFromScoreIndex(index);
         var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
     msg.channel.send("", new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
@@ -124,6 +126,24 @@ function getRandomFileFromFolder(folder) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getTotalVotes() {
+    var votes = 0;
+    for(var waifu in waifuScores) {
+        votes += waifuScores[waifu];
+    }
+    return votes;
+}
+
+function getWaifuFromScoreIndex(index) {
+    var bestGirls = getRankedGirlList();
+    for(var i=0; i < bestGirls.length; i++) {
+        index -= bestGirls[i][1];
+        if(index <= 0)
+            return bestGirls[i][0];
+    }
+    return bestGirls[bestGirls.length-1][0];
 }
 
 function listWaifus(msg) {
@@ -149,7 +169,7 @@ function receivePicture(msg) {
         var filename = attachments[i].filename;
         if(!fs.existsSync(waifuDir+"/" + currentWaifu)) {
             fs.mkdirSync(waifuDir+"/" + currentWaifu);
-            waifuScores[currentWaifu] = 0;
+            waifuScores[currentWaifu] = 1;
         }
         while(fs.existsSync(waifuDir+"/" + currentWaifu + "/" + filename)) {
             filename_count++;
