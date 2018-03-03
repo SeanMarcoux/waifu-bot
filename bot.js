@@ -5,12 +5,14 @@ const request = require('request');
 
 var waifuDir = "waifus";
 var scoreFile = "waifu-scores.txt";
+var lastVoteFile = "last-votes.txt";
 var currentWaifu = "misc";
 var waifuScores = []
+var votes = []
+var lastVote = []
 
 /*TODO
-1. Limit votes per person per day
-2. When saying names, capitalize the first letter of each name
+1. When saying names, capitalize the first letter of each name
 */
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -47,6 +49,21 @@ function initializeWaifuScores() {
             waifuScores[waifu] = score;
         }
     }
+    
+    if(fs.existsSync(lastVoteFile)) {
+        var fileText = fs.readFileSync(lastVoteFile).toString();
+        var lines = fileText.split("\r\n");
+        for(var i = 0; i < lines.length; i++) {
+            if(lines[i].length == 0)
+                break;
+            var splitLine = lines[i].split(" ");
+            var userId = splitLine[0];
+            var voteDay = splitLine[1];
+            var numVotes = splitLine[2];
+            lastVote[userId] = voteDay;
+            votes[userId] = numVotes;
+        }
+    }
 }
 
 function backupScores() {
@@ -55,6 +72,14 @@ function backupScores() {
         fileText += waifu + " " + waifuScores[waifu] + "\r\n";
     }
     fs.writeFileSync(scoreFile, fileText);
+    
+    fileText = "";
+    for(vote in lastVote) {
+        if(!votes[vote])
+            votes[vote] = 0;
+        fileText += vote + " " + lastVote[vote] + " " + votes[vote] + "\r\n";
+    }
+    fs.writeFileSync(lastVoteFile, fileText);
 }
 
 client.on('message', msg => {
@@ -62,6 +87,9 @@ client.on('message', msg => {
         return;
     if(msg.author.username == "waifu-bot")
         return;
+    if(!msg.channel.name)
+        console.log("Message received from " + msg.author.username + ": " + msg.content);
+    
     var message = msg.content.toLowerCase();
     
     if(message === "waifu-bot, die")
@@ -134,7 +162,9 @@ function noWaifuNoLaifu(msg) {
     }
     else {
         var totalVotes = getTotalVotes();
+        console.log("Total votes: " + totalVotes);
         var index = getRandomInt(1, totalVotes);
+        console.log("Index: " + index);
         chosenWaifu = getWaifuFromScoreIndex(index);
         var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
@@ -159,7 +189,7 @@ function getRandomInt(min, max) {
 function getTotalVotes() {
     var votes = 0;
     for(var waifu in waifuScores) {
-        votes += waifuScores[waifu];
+        votes += parseInt(waifuScores[waifu]);
     }
     return votes;
 }
@@ -196,7 +226,7 @@ function receivePicture(msg) {
         var filename = attachments[i].filename;
         split_name = filename.split(".");
         var filetype = split_name[split_name.length-1];
-        if(filetype != "jpg" && filetype != "gif" && filetype != "png") {
+        if(filetype != "jpg" && filetype != "jpeg" && filetype != "gif" && filetype != "png") {
             console.log("Got sketchy file: " + filename);
             msg.reply("I only accept jpg, png, and gif files! Pls no viruses");
             return;
@@ -229,6 +259,15 @@ function download(uri, filename, callback) {
 }
 
 function voteForBestGirl(msg) {
+    var userId = msg.author.id;
+    var date = new Date();
+    if(!votes[userId] || (lastVote[userId] && date.getDate() != lastVote[userId]))
+        votes[userId] = 0;
+    if(votes[userId] >= 5) {
+        msg.reply("You've already used up all your daily votes! You only get 5 votes per day. Come back tomorrow to votes again.");
+        return;
+    }
+    
     var message = msg.content.toLowerCase();
     var bestGirl = getStringAfterSpace(message);
     
@@ -240,6 +279,8 @@ function voteForBestGirl(msg) {
     }
     
     waifuScores[bestGirl]++;
+    votes[userId]++;
+    lastVote[userId] = date.getDate();
     backupScores();
     msg.reply("Vote cast for " + bestGirl + ". They are now at " + waifuScores[bestGirl] + " points!");
 }
