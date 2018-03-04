@@ -171,7 +171,8 @@ function noWaifuNoLaifu(msg) {
         chosenWaifu = getWaifuFromScoreIndex(index);
         var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
-    msg.channel.send("", new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
+    var waifuDisplay = getCapitalizedName(chosenWaifu);
+    msg.channel.send(waifuDisplay, new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
 }
 
 function getStringAfterSpace(string) {
