@@ -12,7 +12,8 @@ var votes = []
 var lastVote = []
 
 /*TODO
-1. When saying names, capitalize the first letter of each name
+1. Post pic of #1 girl with best girl ranking
+2. Post name of girl with the random picture
 */
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -124,7 +125,8 @@ function reactToCommands(msg, message)
         changeIncomingMode(msg);
     }
     else if(message.startsWith("!current")) {
-        msg.reply("I'm currently waiting for pictures of " + currentWaifu);
+        var waifuDisplay = getCapitalizedName(currentWaifu);
+        msg.reply("I'm currently waiting for pictures of " + waifuDisplay);
     }
     else if(message.startsWith("!bestgirl ")) {
         voteForBestGirl(msg);
@@ -153,7 +155,8 @@ function noWaifuNoLaifu(msg) {
     var chosenWaifu = getStringAfterSpace(msg.content.toLowerCase());
     if(chosenWaifu) {
         if(!fs.existsSync(waifuDir + "/" + chosenWaifu)) {
-            msg.reply("I have no pictures of " + chosenWaifu + " D:\n"
+            var waifuDisplay = getCapitalizedName(chosenWaifu);
+            msg.reply("I have no pictures of " + waifuDisplay + " D:\n"
                     + "I am now awaiting pictures of that waifu, so feel free to send me some now!");
             currentWaifu = chosenWaifu;
             return;
@@ -208,7 +211,8 @@ function listWaifus(msg) {
     var files = fs.readdirSync(waifuDir);
     var waifuList = "Here are all of the waifus I currently have pictures of:\n";
     for(var i = 0; i < files.length; i++) {
-        waifuList += (i+1) + ". " + files[i] + "\n"
+        var waifuDisplay = getCapitalizedName(files[i]);
+        waifuList += (i+1) + ". " + waifuDisplay + "\n"
     }
     msg.channel.send(waifuList);
 }
@@ -216,7 +220,8 @@ function listWaifus(msg) {
 function changeIncomingMode(msg) {
     var message = msg.content.toLowerCase();
     currentWaifu = getStringAfterSpace(message);
-    msg.channel.send("Ready to receive pictures of " + currentWaifu);
+    var waifuDisplay = getCapitalizedName(currentWaifu);
+    msg.channel.send("Ready to receive pictures of " + waifuDisplay);
 }
 
 function receivePicture(msg) {
@@ -272,7 +277,8 @@ function voteForBestGirl(msg) {
     var bestGirl = getStringAfterSpace(message);
     
     if(!fs.existsSync(waifuDir + "/" + bestGirl)) {
-        msg.reply("I have no pictures of " + bestGirl + " D:\n"
+        var bestGirlDisplay = getCapitalizedName(bestGirl);
+        msg.reply("I have no pictures of " + bestGirlDisplay + " D:\n"
                 + "I am now awaiting pictures of that waifu, so feel free to send me some now!");
         currentWaifu = bestGirl;
         return;
@@ -282,7 +288,8 @@ function voteForBestGirl(msg) {
     votes[userId]++;
     lastVote[userId] = date.getDate();
     backupScores();
-    msg.reply("Vote cast for " + bestGirl + ". They are now at " + waifuScores[bestGirl] + " points!");
+    var bestGirlDisplay = getCapitalizedName(bestGirl);
+    msg.reply("Vote cast for " + bestGirlDisplay + ". They are now at " + waifuScores[bestGirl] + " points!");
 }
 
 function whoIsBest(msg) {
@@ -290,7 +297,8 @@ function whoIsBest(msg) {
     
     var girlRankings = "Best girls are:\n";
     for(var i = 0; i < bestGirls.length; i++) {
-        girlRankings += (i+1) + ". " + bestGirls[i][0] + ": " + bestGirls[i][1] + "\n";
+        var girlName = getCapitalizedName(bestGirls[i][0]);
+        girlRankings += (i+1) + ". " + girlName + ": " + bestGirls[i][1] + "\n";
     }
     msg.channel.send(girlRankings);
 }
@@ -307,6 +315,19 @@ function getRankedGirlList() {
     return bestGirls;
 }
 
+function getCapitalizedName(name) {
+    var splitName = name.split(" ");
+    var fixedName = ""
+    for(var i = 0; i < splitName.length; i++) {
+        fixedName += getCapitalizedString(splitName[i]) + " ";
+    }
+    
+    return fixedName.trim();
+}
+
+function getCapitalizedString(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 var key = fs.readFileSync("key.txt");
 client.login(key.toString());
