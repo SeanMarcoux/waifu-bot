@@ -11,10 +11,6 @@ var waifuScores = []
 var votes = []
 var lastVote = []
 
-/*TODO
-1. Post pic of #1 girl with best girl ranking
-2. Post name of girl with the random picture
-*/
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
         fs.mkdirSync(waifuDir);
@@ -161,7 +157,6 @@ function noWaifuNoLaifu(msg) {
             currentWaifu = chosenWaifu;
             return;
         }
-        var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
     else {
         var totalVotes = getTotalVotes();
@@ -169,10 +164,14 @@ function noWaifuNoLaifu(msg) {
         var index = getRandomInt(1, totalVotes);
         console.log("Index: " + index);
         chosenWaifu = getWaifuFromScoreIndex(index);
-        var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
     }
     var waifuDisplay = getCapitalizedName(chosenWaifu);
-    msg.channel.send(waifuDisplay, new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
+    sendWaifuPicWithMessage(msg, waifuDisplay, chosenWaifu);
+}
+
+function sendWaifuPicWithMessage(msg, message, waifu) {
+    var waifuPic = getRandomFileFromFolder(waifuDir+"/"+waifu);
+    msg.channel.send(message, new Discord.Attachment(waifuDir+"/"+waifu+"/"+waifuPic));
 }
 
 function getStringAfterSpace(string) {
@@ -301,7 +300,7 @@ function whoIsBest(msg) {
         var girlName = getCapitalizedName(bestGirls[i][0]);
         girlRankings += (i+1) + ". " + girlName + ": " + bestGirls[i][1] + "\n";
     }
-    msg.channel.send(girlRankings);
+    sendWaifuPicWithMessage(msg, girlRankings, bestGirls[0][0]);
 }
 
 function getRankedGirlList() {
