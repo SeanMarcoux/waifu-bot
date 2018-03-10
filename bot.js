@@ -41,6 +41,7 @@ function initializeWaifuScores() {
         var lines = fileText.split("\r\n");
         console.log("LINES: " + lines);
         for(var i = 0; i < lines.length; i++) {
+            console.log("LINE + " + i + ": " + lines[i]);
             if(lines[i].length == 0)
                 break;
             var waifu = lines[i].slice(0, lines[i].lastIndexOf(" "));
