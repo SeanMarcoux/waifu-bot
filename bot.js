@@ -170,6 +170,10 @@ function noWaifuNoLaifu(msg) {
 }
 
 function sendWaifuPicWithMessage(msg, message, waifu) {
+    console.log("MESSAGE");
+    console.log(message);
+    console.log("AND THEN WAIFU");
+    console.log(waifu);
     var waifuPic = getRandomFileFromFolder(waifuDir+"/"+waifu);
     msg.channel.send(message, new Discord.Attachment(waifuDir+"/"+waifu+"/"+waifuPic));
 }
