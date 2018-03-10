@@ -310,6 +310,7 @@ function whoIsBest(msg) {
     for(var i = 0; i < bestGirls.length; i++) {
         var girlName = getCapitalizedName(bestGirls[i][0]);
         girlRankings += (i+1) + ". " + girlName + ": " + bestGirls[i][1] + "\n";
+        console.log("girl " + girlName + " ranking: " bestGirls[i][1]);
     }
     sendWaifuPicWithMessage(msg, girlRankings, bestGirls[0][0]);
 }
