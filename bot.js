@@ -221,8 +221,8 @@ function changeIncomingMode(msg) {
     var message = msg.content.toLowerCase();
     requestedWaifu = getStringAfterSpace(message);
     
-    if(requestedWaifu.indexOf('.') > -1 || requestedWaifu.indexOf('\\') > -1 || requestedWaifu.indexOf('/') > -1) {
-        msg.reply("I see what you're doing there. Nice try. You can't have a ., /, or \\ in your waifu name.");
+    if(requestedWaifu.indexOf('.') > -1 || requestedWaifu.indexOf('\\') > -1 || requestedWaifu.indexOf('/') > -1 || requestedWaifu.indexOf(':') > -1 || requestedWaifu.indexOf('*') > -1 || requestedWaifu.indexOf('?') > -1 || requestedWaifu.indexOf('\"') > -1 || requestedWaifu.indexOf('<') > -1 || requestedWaifu.indexOf('>') > -1 || requestedWaifu.indexOf('|') > -1) {
+        msg.reply("I see what you're doing there. Nice try. You can't have a ., /, \\, :, ?, \", <, >, or | in your waifu name.");
         return;
     }
     
