@@ -37,11 +37,8 @@ function initializeWaifuScores() {
     }
     else {
         var fileText = fs.readFileSync(scoreFile).toString();
-        console.log("FILE TEXT: " + fileText);
         var lines = fileText.split("\n");
-        console.log("LINES: " + lines);
         for(var i = 0; i < lines.length; i++) {
-            console.log("LINE + " + i + ": " + lines[i]);
             if(lines[i].length == 0)
                 break;
             var waifu = lines[i].slice(0, lines[i].lastIndexOf(" "));
@@ -69,7 +66,7 @@ function initializeWaifuScores() {
 function backupScores() {
     var fileText = "";
     for(waifu in waifuScores) {
-        fileText += waifu + " " + waifuScores[waifu] + "\r\n";
+        fileText += waifu + " " + waifuScores[waifu] + "\n";
     }
     fs.writeFileSync(scoreFile, fileText);
     
@@ -77,7 +74,7 @@ function backupScores() {
     for(vote in lastVote) {
         if(!votes[vote])
             votes[vote] = 0;
-        fileText += vote + " " + lastVote[vote] + " " + votes[vote] + "\r\n";
+        fileText += vote + " " + lastVote[vote] + " " + votes[vote] + "\n";
     }
     fs.writeFileSync(lastVoteFile, fileText);
 }
@@ -163,9 +160,7 @@ function noWaifuNoLaifu(msg) {
     }
     else {
         var totalVotes = getTotalVotes();
-        console.log("Total votes: " + totalVotes);
         var index = getRandomInt(1, totalVotes);
-        console.log("Index: " + index);
         chosenWaifu = getWaifuFromScoreIndex(index);
     }
     var waifuDisplay = getCapitalizedName(chosenWaifu);
@@ -173,10 +168,6 @@ function noWaifuNoLaifu(msg) {
 }
 
 function sendWaifuPicWithMessage(msg, message, waifu) {
-    console.log("MESSAGE");
-    console.log(message);
-    console.log("AND THEN WAIFU");
-    console.log(waifu);
     var waifuPic = getRandomFileFromFolder(waifuDir+"/"+waifu);
     msg.channel.send(message, new Discord.Attachment(waifuDir+"/"+waifu+"/"+waifuPic));
 }
@@ -313,7 +304,6 @@ function whoIsBest(msg) {
     for(var i = 0; i < bestGirls.length; i++) {
         var girlName = getCapitalizedName(bestGirls[i][0]);
         girlRankings += (i+1) + ". " + girlName + ": " + bestGirls[i][1] + "\n";
-        console.log("girl " + girlName + " ranking: " + bestGirls[i][1]);
     }
     sendWaifuPicWithMessage(msg, girlRankings, bestGirls[0][0]);
 }
