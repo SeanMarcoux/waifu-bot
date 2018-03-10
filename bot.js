@@ -38,7 +38,7 @@ function initializeWaifuScores() {
     else {
         var fileText = fs.readFileSync(scoreFile).toString();
         console.log("FILE TEXT: " + fileText);
-        var lines = fileText.split("\r\n");
+        var lines = fileText.split("\n");
         console.log("LINES: " + lines);
         for(var i = 0; i < lines.length; i++) {
             console.log("LINE + " + i + ": " + lines[i]);
@@ -52,7 +52,7 @@ function initializeWaifuScores() {
     
     if(fs.existsSync(lastVoteFile)) {
         var fileText = fs.readFileSync(lastVoteFile).toString();
-        var lines = fileText.split("\r\n");
+        var lines = fileText.split("\n");
         for(var i = 0; i < lines.length; i++) {
             if(lines[i].length == 0)
                 break;
