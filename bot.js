@@ -247,6 +247,7 @@ function receivePicture(msg) {
         if(!fs.existsSync(waifuDir+"/" + currentWaifu)) {
             fs.mkdirSync(waifuDir+"/" + currentWaifu);
             waifuScores[currentWaifu] = 1;
+            backupScores();
         }
         while(fs.existsSync(waifuDir+"/" + currentWaifu + "/" + filename)) {
             filename_count++;
@@ -295,6 +296,9 @@ function voteForBestGirl(msg) {
     backupScores();
     var bestGirlDisplay = getCapitalizedName(bestGirl);
     msg.reply("Vote cast for " + bestGirlDisplay + ". They are now at " + waifuScores[bestGirl] + " points!");
+    if(waifuScores[bestGirl] == 69) {
+        msg.reply("Nice");
+    }
 }
 
 function whoIsBest(msg) {
