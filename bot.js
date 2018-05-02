@@ -10,6 +10,7 @@ var currentWaifu = "misc";
 var waifuScores = []
 var votes = []
 var lastVote = []
+var miscTimer;
 
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -155,6 +156,7 @@ function noWaifuNoLaifu(msg) {
             msg.reply("I have no pictures of " + waifuDisplay + " D:\n"
                     + "I am now awaiting pictures of that waifu, so feel free to send me some now!");
             currentWaifu = chosenWaifu;
+            setMiscTimer();
             return;
         }
     }
@@ -227,6 +229,20 @@ function changeIncomingMode(msg) {
     currentWaifu = requestedWaifu;
     var waifuDisplay = getCapitalizedName(currentWaifu);
     msg.channel.send("Ready to receive pictures of " + waifuDisplay);
+    setMiscTimer();
+}
+
+//After 5 minutes of inactivity, sets the waifu back to misc
+function setMiscTimer() {
+    if(miscTimer)
+    {
+        console.log("Clearing timeout");
+        clearTimeout(miscTimer);
+    }
+    miscTimer = setTimeout(function(){
+        currentWaifu = "misc";
+        console.log("5 mins of inactivity. Setting waifu back to misc");
+    }, 1000*60*1);
 }
 
 function receivePicture(msg) {
@@ -258,6 +274,7 @@ function receivePicture(msg) {
             console.log("Done");
         });
     }
+    setMiscTimer();
 }
 
 function download(uri, filename, callback) {
@@ -287,6 +304,7 @@ function voteForBestGirl(msg) {
         msg.reply("I have no pictures of " + bestGirlDisplay + " D:\n"
                 + "I am now awaiting pictures of that waifu, so feel free to send me some now!");
         currentWaifu = bestGirl;
+        setMiscTimer();
         return;
     }
     
