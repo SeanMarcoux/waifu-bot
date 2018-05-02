@@ -242,7 +242,7 @@ function setMiscTimer() {
     miscTimer = setTimeout(function(){
         currentWaifu = "misc";
         console.log("5 mins of inactivity. Setting waifu back to misc");
-    }, 1000*60*1);
+    }, 1000*60*5);
 }
 
 function receivePicture(msg) {
