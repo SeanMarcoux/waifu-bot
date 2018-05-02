@@ -11,6 +11,7 @@ var waifuScores = []
 var votes = []
 var lastVote = []
 var miscTimer;
+var dailyWaifuTimer;
 
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -20,13 +21,31 @@ client.on('ready', () => {
     
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity("Loving all my waifus");
+    
+    postDailyWaifu();
+});
+
+function startDailyWaifuTimer()
+{
+    dailyWaifuTimer = setTimeout(postDailyWaifu, 1000*60*60*24);
+}
+
+function postDailyWaifu()
+{
+    var chosenWaifu = getRandomVotedWaifu();
+    var waifuDisplay = getCapitalizedName(chosenWaifu);
+    var waifuPic = getRandomFileFromFolder(waifuDir+"/"+chosenWaifu);
+    
     var channels = client.channels.array();
     for(var j = 0; j < channels.length; j++)
     {
-        //if(channels[j].name.toLowerCase().includes("bot"))
-        //    channels[j].send("Ohaiyo minna! <3");
+        if(channels[j].name.toLowerCase().includes("bot"))
+        {
+            channels[j].send("The waifu of the day today is " + waifuDisplay, new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
+        }
     }
-});
+    startDailyWaifuTimer();
+}
 
 function initializeWaifuScores() {
     if(!fs.existsSync(scoreFile)) {
@@ -161,9 +180,7 @@ function noWaifuNoLaifu(msg) {
         }
     }
     else {
-        var totalVotes = getTotalVotes();
-        var index = getRandomInt(1, totalVotes);
-        chosenWaifu = getWaifuFromScoreIndex(index);
+        chosenWaifu = getRandomVotedWaifu();
     }
     var waifuDisplay = getCapitalizedName(chosenWaifu);
     sendWaifuPicWithMessage(msg, waifuDisplay, chosenWaifu);
@@ -187,6 +204,14 @@ function getRandomFileFromFolder(folder) {
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomVotedWaifu()
+{
+    var totalVotes = getTotalVotes();
+    var index = getRandomInt(1, totalVotes);
+    var chosenWaifu = getWaifuFromScoreIndex(index);
+    return chosenWaifu;
 }
 
 function getTotalVotes() {
@@ -236,12 +261,10 @@ function changeIncomingMode(msg) {
 function setMiscTimer() {
     if(miscTimer)
     {
-        console.log("Clearing timeout");
         clearTimeout(miscTimer);
     }
     miscTimer = setTimeout(function(){
         currentWaifu = "misc";
-        console.log("5 mins of inactivity. Setting waifu back to misc");
     }, 1000*60*5);
 }
 
