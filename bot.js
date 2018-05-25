@@ -584,7 +584,7 @@ function getRankedGirlList() {
 function whoIsBestBoy(msg) {
     var bestBoys = getRankedBoyList();
     
-    var boyRankings = "Best girls are:\n";
+    var boyRankings = "Best boys are:\n";
     for(var i = 0; i < bestBoys.length; i++) {
         var boyName = getCapitalizedName(bestBoys[i][0]);
         boyRankings += (i+1) + ". " + boyName + ": " + bestBoys[i][1] + "\n";
