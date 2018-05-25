@@ -39,7 +39,7 @@ function postDailyWaifu()
     var channels = client.channels.array();
     for(var j = 0; j < channels.length; j++)
     {
-        if(channels[j].name.toLowerCase().includes("bot"))
+        if(channels[j].name && channels[j].name.toLowerCase().includes("bot"))
         {
             channels[j].send("The waifu of the day today is " + waifuDisplay, new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
         }
