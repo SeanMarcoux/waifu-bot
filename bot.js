@@ -30,12 +30,23 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity("Loving all my waifus");
     
-    postDailyWaifu();
+    startDailyWaifuTimer();
 });
 
 function startDailyWaifuTimer()
 {
-    dailyWaifuTimer = setTimeout(postDailyWaifu, 1000*60*60*24);
+    var millis = getMillisTilMidnight();
+    dailyWaifuTimer = setTimeout(postDailyWaifu, millis);
+}
+
+function getMillisTilMidnight() {
+    var midnight = new Date();
+    midnight.setHours( 24 );
+    midnight.setMinutes( 0 );
+    midnight.setSeconds( 0 );
+    midnight.setMilliseconds( 0 );
+    var currentTime = new Date().getTime();
+    return (midnight.getTime() - currentTime);
 }
 
 function postDailyWaifu()
