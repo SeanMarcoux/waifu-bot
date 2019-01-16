@@ -19,7 +19,7 @@ var husbundoScores = []
 var husbundoVotes = []
 var husbundoLastVote = []
 var miscTimer;
-var dailyWaifuTimer;
+var dailyTimer;
 
 client.on('ready', () => {
     if(!fs.existsSync(waifuDir)) {
@@ -30,13 +30,13 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity("Loving all my waifus");
     
-    startDailyWaifuTimer();
+    startDailyTimer();
 });
 
-function startDailyWaifuTimer()
+function startDailyTimer()
 {
     var millis = getMillisTilMidnight();
-    dailyWaifuTimer = setTimeout(postDailyWaifu, millis);
+    dailyTimer = setTimeout(postDaily, millis);
 }
 
 function getMillisTilMidnight() {
@@ -47,6 +47,13 @@ function getMillisTilMidnight() {
     midnight.setMilliseconds( 0 );
     var currentTime = new Date().getTime();
     return (midnight.getTime() - currentTime);
+}
+
+function postDaily()
+{
+    postDailyWaifu();
+    postDailyHusbundo();
+    startDailyTimer();
 }
 
 function postDailyWaifu()
@@ -63,7 +70,22 @@ function postDailyWaifu()
             channels[j].send("The waifu of the day today is " + waifuDisplay, new Discord.Attachment(waifuDir+"/"+chosenWaifu+"/"+waifuPic));
         }
     }
-    startDailyWaifuTimer();
+}
+
+function postDailyHusbundo()
+{
+    var chosenHusbundo = getRandomVotedHusbundo();
+    var husbundoDisplay = getCapitalizedName(chosenHusbundo);
+    var husbundoPic = getRandomFileFromFolder(husbundoDir+"/"+chosenHusbundo);
+    
+    var channels = client.channels.array();
+    for(var j = 0; j < channels.length; j++)
+    {
+        if(channels[j].name && channels[j].name.toLowerCase().includes("bot"))
+        {
+            channels[j].send("The husbundo of the day today is " + husbundoDisplay, new Discord.Attachment(husbundoDir+"/"+chosenHusbundo+"/"+husbundoPic));
+        }
+    }
 }
 
 function initializeWaifuScores() {
